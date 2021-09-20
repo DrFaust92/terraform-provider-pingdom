@@ -52,8 +52,7 @@ func resourcePingdomCheck() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: false,
-				Default:  30000,
-				// Computed: true,
+				Default:  0,
 			},
 
 			"resolution": {
@@ -69,7 +68,6 @@ func resourcePingdomCheck() *schema.Resource {
 				Optional: true,
 				ForceNew: false,
 				Default:  2,
-				// Computed: true,
 			},
 
 			"notifyagainevery": {

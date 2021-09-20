@@ -33,4 +33,7 @@ mod:
 	@go mod tidy
 	@go mod vendor
 
+testacc:
+	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m
+
 .PHONY: build install lint test clean build-linux mod
