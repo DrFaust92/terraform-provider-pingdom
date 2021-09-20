@@ -26,13 +26,11 @@ func resourcePingdomCheck() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: false,
 			},
 
 			"host": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: false,
 			},
 
 			"type": {
@@ -45,20 +43,17 @@ func resourcePingdomCheck() *schema.Resource {
 			"paused": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"responsetime_threshold": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				ForceNew: false,
 				Default:  0,
 			},
 
 			"resolution": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ForceNew:     false,
 				Default:      5,
 				ValidateFunc: validation.IntInSlice([]int{1, 5, 15, 30, 60}),
 			},
@@ -66,48 +61,41 @@ func resourcePingdomCheck() *schema.Resource {
 			"sendnotificationwhendown": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				ForceNew: false,
 				Default:  2,
 			},
 
 			"notifyagainevery": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				ForceNew: false,
 				Default:  0,
 			},
 
 			"notifywhenbackup": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: false,
 				Computed: true,
 			},
 
 			"integrationids": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 
 			"encryption": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"url": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 				Default:  "/",
 			},
 
 			"port": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ForceNew:     false,
 				Computed:     true,
 				ValidateFunc: validation.IsPortNumber,
 			},
@@ -115,42 +103,36 @@ func resourcePingdomCheck() *schema.Resource {
 			"username": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"password": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: false,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 
 			"shouldcontain": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"shouldnotcontain": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"postdata": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"requestheaders": {
 				Type:     schema.TypeMap,
 				Optional: true,
-				ForceNew: false,
 			},
 			"tags": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 				StateFunc: func(val interface{}) string {
 					return sortString(val.(string), ",")
 				},
@@ -159,43 +141,36 @@ func resourcePingdomCheck() *schema.Resource {
 			"probefilters": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"userids": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 
 			"teamids": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 
 			"stringtosend": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 
 			"stringtoexpect": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: false,
 			},
 			"verify_certificate": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: false,
 			},
 			"ssl_down_days_before": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				ForceNew: false,
 				Default:  0,
 			},
 		},
@@ -238,14 +213,9 @@ func sortString(input string, seperator string) string {
 }
 
 func checkForResource(d *schema.ResourceData) (pingdom.Check, error) {
-	checkParams := commonCheckParams{}
-
-	// required
-	if v, ok := d.GetOk("name"); ok {
-		checkParams.Name = v.(string)
-	}
-	if v, ok := d.GetOk("host"); ok {
-		checkParams.Hostname = v.(string)
+	checkParams := commonCheckParams{
+		Name:     d.Get("name").(string),
+		Hostname: d.Get("host").(string),
 	}
 
 	if v, ok := d.GetOk("paused"); ok {
