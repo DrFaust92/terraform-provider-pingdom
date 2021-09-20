@@ -3,6 +3,8 @@ package pingdom
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -15,7 +17,9 @@ func TestAccPingdomCheck_basic(t *testing.T) {
 	var check pingdom.CheckResponse
 
 	rName := acctest.RandomWithPrefix("tf-acc-test")
+	rNameUpdated := acctest.RandomWithPrefix("tf-acc-test")
 	resourceName := "pingdom_check.test"
+
 	resource.Test(t, resource.TestCase{
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPingdomCheckDestroy,
@@ -42,11 +46,28 @@ func TestAccPingdomCheck_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			{
+				Config: testAccPingdomBasicConfig(rNameUpdated),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPingdomCheckExists(resourceName, &check),
+					resource.TestCheckResourceAttr(resourceName, "name", rNameUpdated),
+					resource.TestCheckResourceAttr(resourceName, "type", "http"),
+					resource.TestCheckResourceAttr(resourceName, "host", "example.com"),
+					resource.TestCheckResourceAttr(resourceName, "url", "/"),
+					resource.TestCheckResourceAttr(resourceName, "verify_certificate", "false"),
+					resource.TestCheckResourceAttr(resourceName, "ssl_down_days_before", "0"),
+					resource.TestCheckResourceAttr(resourceName, "sendnotificationwhendown", "2"),
+					resource.TestCheckResourceAttr(resourceName, "resolution", "5"),
+					resource.TestCheckResourceAttr(resourceName, "notifywhenbackup", "false"),
+					resource.TestCheckResourceAttr(resourceName, "notifyagainevery", "0"),
+					resource.TestCheckResourceAttr(resourceName, "encryption", "false"),
+				),
+			},
 		},
 	})
 }
 
-func testAccCheckPingdomCheckExists(n string, checkId *pingdom.CheckResponse) resource.TestCheckFunc {
+func testAccCheckPingdomCheckExists(n string, check *pingdom.CheckResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -58,17 +79,17 @@ func testAccCheckPingdomCheckExists(n string, checkId *pingdom.CheckResponse) re
 		}
 
 		client := testAccProvider.Meta().(*pingdom.Client)
-		keys, err := client.Checks.List()
+		id, err := strconv.Atoi(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
-		for _, key := range keys {
-			if fmt.Sprint(key.ID) == rs.Primary.ID {
-				*checkId = key
-				break
-			}
+		resp, err := client.Checks.Read(id)
+		if err != nil {
+			return err
 		}
+
+		*check = *resp
 		return nil
 	}
 }
@@ -81,16 +102,21 @@ func testAccCheckPingdomCheckDestroy(s *terraform.State) error {
 			continue
 		}
 
-		keys, err := client.Checks.List()
+		id, err := strconv.Atoi(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
-		if err == nil {
-			for _, key := range keys {
-				if fmt.Sprint(key.ID) == rs.Primary.ID {
-					return errors.New("Key still exists")
-				}
+
+		resp, err := client.Checks.Read(id)
+		if err != nil {
+			if strings.Contains(fmt.Sprint(err), "Invalid check identifier") {
+				return nil
 			}
+			return err
+		}
+
+		if resp.ID == id {
+			return errors.New("Key still exists")
 		}
 		return nil
 	}
