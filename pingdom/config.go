@@ -3,10 +3,13 @@ package pingdom
 import (
 	"errors"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/DrFaust92/go-pingdom/pingdom"
 	"github.com/DrFaust92/go-pingdom/pingdomext"
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 // Config respresents the client configuration
@@ -15,6 +18,9 @@ type Config struct {
 	SolarwindsUser     string `mapstructure:"solarwinds_user"`
 	SolarwindsPassword string `mapstructure:"solarwinds_passwd"`
 	SolarwindsOrgID    string `mapstructure:"solarwinds_org_id"`
+	MaxRetries         int    `mapstructure:"max_retries"`
+	RetryWaitMin       int    `mapstructure:"retry_wait_min"`
+	RetryWaitMax       int    `mapstructure:"retry_wait_max"`
 }
 
 type Clients struct {
@@ -77,9 +83,46 @@ func (c *Config) pingdomClient() (*pingdom.Client, error) {
 		c.APIToken = v
 	}
 
-	client, _ := pingdom.NewClientWithConfig(pingdom.ClientConfig{APIToken: c.APIToken})
+	// Set default retry configuration if not provided
+	maxRetries := 3
+	if c.MaxRetries > 0 {
+		maxRetries = c.MaxRetries
+	}
 
-	log.Printf("[INFO] Pingdom Client configured.")
+	retryWaitMin := 1
+	if c.RetryWaitMin > 0 {
+		retryWaitMin = c.RetryWaitMin
+	}
+
+	retryWaitMax := 30
+	if c.RetryWaitMax > 0 {
+		retryWaitMax = c.RetryWaitMax
+	}
+
+	// Create a retryable HTTP client
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = maxRetries
+	retryClient.RetryWaitMin = time.Duration(retryWaitMin) * time.Second
+	retryClient.RetryWaitMax = time.Duration(retryWaitMax) * time.Second
+
+	// Add logging for retries
+	retryClient.Logger = nil // Disable default logger
+	retryClient.RequestLogHook = func(logger retryablehttp.Logger, req *http.Request, retry int) {
+		if retry > 0 {
+			log.Printf("[INFO] Retrying Pingdom API request to %s (attempt %d/%d)", req.URL, retry, maxRetries)
+		}
+	}
+
+	// Get standard client with retry transport
+	standardClient := retryClient.StandardClient()
+
+	// Create Pingdom client with the retry-enabled HTTP client
+	client, _ := pingdom.NewClientWithConfig(pingdom.ClientConfig{
+		APIToken:   c.APIToken,
+		HTTPClient: standardClient,
+	})
+
+	log.Printf("[INFO] Pingdom Client configured with retry capability (max attempts: %d).", maxRetries+1)
 
 	return client, nil
 }

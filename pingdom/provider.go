@@ -30,6 +30,24 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SOLARWINDS_ORG_ID", nil),
 			},
+			"max_retries": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PINGDOM_MAX_RETRIES", 3),
+				Description: "Maximum number of retries for API calls.",
+			},
+			"retry_wait_min": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PINGDOM_RETRY_WAIT_MIN", 1),
+				Description: "Minimum wait time in seconds between retries.",
+			},
+			"retry_wait_max": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PINGDOM_RETRY_WAIT_MAX", 30),
+				Description: "Maximum wait time in seconds between retries.",
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"pingdom_check":       resourcePingdomCheck(),
