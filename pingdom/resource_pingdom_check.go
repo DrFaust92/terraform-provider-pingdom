@@ -22,6 +22,8 @@ const (
 )
 
 func resourcePingdomCheck() *schema.Resource {
+	passwordWO, passwordWOVersion := writeOnlySchemas("password")
+
 	return &schema.Resource{
 		CreateContext: resourcePingdomCheckCreate,
 		ReadContext:   resourcePingdomCheckRead,
@@ -120,6 +122,8 @@ func resourcePingdomCheck() *schema.Resource {
 				ForceNew:  false,
 				Sensitive: true,
 			},
+			"password_wo":         passwordWO,
+			"password_wo_version": passwordWOVersion,
 			"shouldcontain": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -316,8 +320,8 @@ func checkForResource(d *schema.ResourceData) (pingdom.Check, error) {
 		checkParams.Username = v.(string)
 	}
 
-	if v, ok := d.GetOk("password"); ok {
-		checkParams.Password = v.(string)
+	if v := writeOnlyOrValue(d, "password"); v != "" {
+		checkParams.Password = v
 	}
 
 	if v, ok := d.GetOk("shouldcontain"); ok {
@@ -616,8 +620,11 @@ func resourcePingdomCheckRead(ctx context.Context, d *schema.ResourceData, meta 
 		if err := d.Set("username", ck.Type.HTTP.Username); err != nil {
 			return diag.FromErr(err)
 		}
-		if err := d.Set("password", ck.Type.HTTP.Password); err != nil {
-			return diag.FromErr(err)
+		// The API returns the password, with password_wo it must not be stored in state.
+		if !usesWriteOnly(d, "password") {
+			if err := d.Set("password", ck.Type.HTTP.Password); err != nil {
+				return diag.FromErr(err)
+			}
 		}
 		if err := d.Set("shouldcontain", ck.Type.HTTP.ShouldContain); err != nil {
 			return diag.FromErr(err)

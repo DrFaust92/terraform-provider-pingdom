@@ -40,7 +40,9 @@ The following arguments are supported:
 * `nameserver` - (Optional) DNS server to use. Valid only for `dns` check type.
 * `notifyagainevery` - (Optional) Notify again every n result. 0 means that no extra notifications will be sent.
 * `notifywhenbackup` - (Optional) Notify when back up again.
-* `password` - (Optional) Password to auth with.
+* `password` - (Optional) Password to auth with. Stored in state, since the API returns it.
+* `password_wo` - (Optional) Write-only alternative to `password`, never stored in Terraform state or plan output. Requires Terraform 1.11 or later. Conflicts with `password`. See [write-only arguments](https://developer.hashicorp.com/terraform/language/manage-sensitive-data/write-only).
+* `password_wo_version` - (Optional) Required with `password_wo`. Terraform cannot detect changes to write-only values, change this value (e.g. `"2"`) to send an updated `password_wo`.
 * `paused` - (Optional) Whether the check is paused.
 * `port` - (Optional) Target port.
 * `postdata` - (Optional) Data that should be posted to the web page, for example submission data for a sign-up or login form. The data needs to be formatted in the same way as a web browser would send it to the web server.
