@@ -2,25 +2,18 @@ name: Go Linter
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+permissions:
+  contents: read
 jobs:
   golangci:
     name: Run linter
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Set up Go
-        uses: actions/setup-go@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
-          go-version-file: 'go.mod'
-          cache: true
-
+          go-version-file: "go.mod"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v9
         with:
-          go-version-file: 'go.mod'
-          cache: true
-          version: v1.49.0
           only-new-issues: true
