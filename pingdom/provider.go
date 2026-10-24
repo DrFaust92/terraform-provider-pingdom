@@ -47,6 +47,7 @@ func Provider() *schema.Provider {
 			"pingdom_teams":        dataSourcePingdomTeams(),
 			"pingdom_integration":  dataSourcePingdomIntegration(),
 			"pingdom_integrations": dataSourcePingdomIntegrations(),
+			"pingdom_probes":       dataSourcePingdomProbes(),
 		},
 		ConfigureFunc: providerConfigure,
 	}

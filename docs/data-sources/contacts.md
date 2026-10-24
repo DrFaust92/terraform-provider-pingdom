@@ -1,9 +1,9 @@
 ---
 layout: "pingdom"
-page_title: "Bitbucket: pingdom_contacts"
+page_title: "Pingdom: pingdom_contacts"
 sidebar_current: "docs-pingdom-data-contacts"
 description: |-
-  Provides a data for a Bitbucket contacts
+  Provides a data for a Pingdom contacts
 ---
 
 # pingdom\_contacts

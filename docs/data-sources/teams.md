@@ -1,9 +1,9 @@
 ---
 layout: "pingdom"
-page_title: "Bitbucket: pingdom_teams"
+page_title: "Pingdom: pingdom_teams"
 sidebar_current: "docs-pingdom-data-teams"
 description: |-
-  Provides a data for a Bitbucket teams
+  Provides a data for a Pingdom teams
 ---
 
 # pingdom\_team

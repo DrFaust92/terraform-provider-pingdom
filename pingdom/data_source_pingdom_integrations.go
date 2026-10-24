@@ -32,7 +32,7 @@ func dataSourcePingdomIntegrationsRead(ctx context.Context, d *schema.ResourceDa
 	client := meta.(*Clients).PingdomExt
 
 	if client == nil {
-		return diag.FromErr(fmt.Errorf("Client not correctly configured to use this resource"))
+		return diag.FromErr(errSolarwindsCredentialsRequired)
 	}
 
 	integrations, err := client.Integrations.List()

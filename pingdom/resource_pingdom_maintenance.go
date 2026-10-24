@@ -42,7 +42,7 @@ func resourcePingdomMaintenance() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "none",
-				ValidateFunc: validation.StringInSlice([]string{"none", "day", "week", "month"}, false),
+				ValidateFunc: validation.StringInSlice([]string{"none", "day", "week", "month", "nth-day-of-week-in-month"}, false),
 			},
 			"repeatevery": {
 				Type:     schema.TypeInt,

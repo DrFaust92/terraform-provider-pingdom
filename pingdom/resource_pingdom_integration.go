@@ -89,7 +89,7 @@ func resourcePingdomIntegrationCreate(ctx context.Context, d *schema.ResourceDat
 	client := meta.(*Clients).PingdomExt
 
 	if client == nil {
-		return diag.FromErr(fmt.Errorf("Client not correctly configured to use this resource"))
+		return diag.FromErr(errSolarwindsCredentialsRequired)
 	}
 
 	integration, err := integrationForResource(d, client)
@@ -115,7 +115,7 @@ func resourcePingdomIntegrationUpdate(ctx context.Context, d *schema.ResourceDat
 	client := meta.(*Clients).PingdomExt
 
 	if client == nil {
-		return diag.FromErr(fmt.Errorf("Client not correctly configured to use this resource"))
+		return diag.FromErr(errSolarwindsCredentialsRequired)
 	}
 
 	id, err := strconv.Atoi(d.Id())
@@ -144,7 +144,7 @@ func resourcePingdomIntegrationRead(ctx context.Context, d *schema.ResourceData,
 	client := meta.(*Clients).PingdomExt
 
 	if client == nil {
-		return diag.FromErr(fmt.Errorf("Client not correctly configured to use this resource"))
+		return diag.FromErr(errSolarwindsCredentialsRequired)
 	}
 
 	integrations, err := client.Integrations.List()
@@ -195,7 +195,7 @@ func resourcePingdomIntegrationDelete(ctx context.Context, d *schema.ResourceDat
 	client := meta.(*Clients).PingdomExt
 
 	if client == nil {
-		return diag.FromErr(fmt.Errorf("Client not correctly configured to use this resource"))
+		return diag.FromErr(errSolarwindsCredentialsRequired)
 	}
 
 	id, err := strconv.Atoi(d.Id())
