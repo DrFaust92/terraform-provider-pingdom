@@ -15,14 +15,14 @@ This allows you to manage your pingdom checks.
 ## Example Usage
 
 ```hcl
-resource "pingdom_hook" "deploy_on_push" {
-  check   = "myteam"
-  url         = "https://mywebhookservice.mycompany.com/deploy-on-push"
-  description = "Deploy the code via my webhook"
-
-  events = [
-    "repo:push",
-  ]
+resource "pingdom_check" "example" {
+  type                     = "http"
+  name                     = "my http check"
+  host                     = "example.com"
+  resolution               = 5
+  sendnotificationwhendown = 2
+  integrationids           = [pingdom_integration.example.id]
+  teamids                  = [pingdom_team.example.id]
 }
 ```
 

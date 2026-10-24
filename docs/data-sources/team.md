@@ -1,9 +1,9 @@
 ---
 layout: "pingdom"
-page_title: "Bitbucket: pingdom_team"
+page_title: "Pingdom: pingdom_team"
 sidebar_current: "docs-pingdom-data-team"
 description: |-
-  Provides a data for a Bitbucket team
+  Provides a data for a Pingdom team
 ---
 
 # pingdom\_team
@@ -14,7 +14,7 @@ Provides a way to fetch data on a team.
 
 ```hcl
 data "pingdom_team" "example" {
-  team = "gob"
+  name = "gob"
 }
 ```
 

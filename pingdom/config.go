@@ -83,3 +83,6 @@ func (c *Config) pingdomClient() (*pingdom.Client, error) {
 
 	return client, nil
 }
+
+// errSolarwindsCredentialsRequired is returned by resources that use the SolarWinds API, which does not accept the Pingdom API token.
+var errSolarwindsCredentialsRequired = errors.New("integrations require SolarWinds credentials: set solarwinds_user and solarwinds_passwd (or SOLARWINDS_USER and SOLARWINDS_PASSWD) in the provider configuration")
