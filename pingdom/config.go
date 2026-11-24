@@ -3,7 +3,9 @@ package pingdom
 import (
 	"errors"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/DrFaust92/go-pingdom/pingdom"
 	"github.com/DrFaust92/go-pingdom/pingdomext"
@@ -57,6 +59,13 @@ func (c *Config) Client() (*Clients, error) {
 			Username: c.SolarwindsUser,
 			Password: c.SolarwindsPassword,
 			OrgID:    c.SolarwindsOrgID,
+			// Same as the library default, plus a timeout.
+			HTTPClient: &http.Client{
+				Timeout: httpTimeout,
+				CheckRedirect: func(req *http.Request, via []*http.Request) error {
+					return http.ErrUseLastResponse
+				},
+			},
 		})
 
 		if err != nil {
@@ -71,13 +80,20 @@ func (c *Config) Client() (*Clients, error) {
 	}, nil
 }
 
+// httpTimeout bounds each API request so an unresponsive endpoint cannot hang
+// a plan or apply indefinitely.
+const httpTimeout = 2 * time.Minute
+
 // Client returns a new client for accessing pingdom.
 func (c *Config) pingdomClient() (*pingdom.Client, error) {
 	if v := os.Getenv("PINGDOM_API_TOKEN"); v != "" {
 		c.APIToken = v
 	}
 
-	client, _ := pingdom.NewClientWithConfig(pingdom.ClientConfig{APIToken: c.APIToken})
+	client, _ := pingdom.NewClientWithConfig(pingdom.ClientConfig{
+		APIToken:   c.APIToken,
+		HTTPClient: &http.Client{Timeout: httpTimeout},
+	})
 
 	log.Printf("[INFO] Pingdom Client configured.")
 
