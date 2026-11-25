@@ -1,3 +1,9 @@
+> [!WARNING]
+> **This provider is no longer maintained and the repository has been archived.**
+>
+> The last release, `v1.7.2`, remains available on the [Terraform Registry](https://registry.terraform.io/providers/DrFaust92/pingdom/latest), but there will be no further fixes or releases.
+> If you want to continue maintaining it, feel free to fork it. A community fork also exists at [mbarper/terraform-provider-pingdom](https://github.com/mbarper/terraform-provider-pingdom).
+
 # terraform-provider-pingdom
 
 This project is a [terraform](http://www.terraform.io/) provider for [pingdom](https://www.pingdom.com/).
